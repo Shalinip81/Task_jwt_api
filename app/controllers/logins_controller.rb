@@ -1,11 +1,15 @@
 class LoginsController < ApplicationController
 
     before_action :fetch_user
+
+    include JwtToken
   
     def create
       if @user&.authenticate(params[:password])
+        @token = JwtToken.jwt_encode(@user.id)
         render json: {
           user: @user,
+          token: @token,
           message: "LOGIN SUCCESSFULLY!"
         }, status: 201
       else
@@ -22,6 +26,5 @@ class LoginsController < ApplicationController
         message: "Email not registered!"
       } and return if @user.nil?
     end
-  
   end
   

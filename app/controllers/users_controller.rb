@@ -1,4 +1,8 @@
 class UsersController < ApplicationController
+  include JwtToken
+  before_action :validate_json_web_token ,only:[:show,:update,:destroy]
+  # skip_before_action :validate_json_web_token, only: [:index, :create]
+
 
   def index
     @users=User.all
@@ -6,12 +10,8 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = User.find(params[:id])
+    byebug
     render json: @user,status:200
-  end
-
-  def new
-    @user=User.new
   end
 
   def create
@@ -24,27 +24,19 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    @user=User.find(params[:id])
     @user.destroy
     render json: @user ,status:201
   end
 
-
-  def edit
-    @user =User.find(params[:id])
-    render :edit
-  end
-
-
- def update
-    @user = User.find(params[:id])
+  def update
+    decode = JwtToken.jwt_decode(params[:token])
+    @user = User.find_by_id(decode)
     if @user.update(user_params)
       redirect_to users_path
     else
       redirect_to users_path
     end
   end
-
 
   private
   def user_params
