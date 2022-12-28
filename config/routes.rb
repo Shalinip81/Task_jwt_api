@@ -3,4 +3,6 @@ Rails.application.routes.draw do
 
   resources :users
   get "/login", to: "logins#create"
+
+  resources :articles
 end
